@@ -7,11 +7,13 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
-class TaskEditViewController: UIViewController {
+class TaskEditViewController: BaseViewController {
 
-    var task: Task?
-    var callback: ((Task?) -> ())?
+    var task = Task(title: "")
+    var callback: ((Task) -> ())?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,15 +29,27 @@ class TaskEditViewController: UIViewController {
         titleInput.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 15).isActive = true
         titleInput.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -15).isActive = true
         
-        NotificationCenter.default.addObserver(self, selector: #selector(titleInputTextDidChangeNotification(_:)), name: UITextField.textDidChangeNotification, object: nil)
+        cancelButtonItem.rx.tap.asObservable().subscribe(onNext: { [weak self] in
+            guard let self = self else { return }
+            self.dismiss(animated: true)
+        }).disposed(by: disposeBag)
+        
+        doneButtonItem.rx.tap.asObservable().subscribe(onNext: { [weak self] in
+            guard let self = self else { return }
+            self.dismiss(animated: true)
+            self.titleInput.text.map { self.task.title = $0 }
+            self.callback?(self.task)
+        }).disposed(by: disposeBag)
+        
+        titleInput.rx.text.orEmpty.map { $0.count > 0 }.bind(to: doneButtonItem.rx.isEnabled).disposed(by: disposeBag)
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         titleInput.becomeFirstResponder()
-        titleInput.text = task?.title
-        titleInput.text.map { doneButtonItem.isEnabled = $0.count > 0 }
+        titleInput.text = task.title
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -43,12 +57,8 @@ class TaskEditViewController: UIViewController {
         titleInput.resignFirstResponder()
     }
     
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    private lazy var cancelButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(clickCancelButtonItem(_:)))
-    private lazy var doneButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(clickDoneButtonItem(_:)))
+    private lazy var cancelButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: nil, action: nil)
+    private lazy var doneButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: nil, action: nil)
     
     private lazy var titleInput: UITextField = {
         let titleInput = UITextField()
@@ -61,24 +71,4 @@ class TaskEditViewController: UIViewController {
         return titleInput
     }()
 
-}
-
-@objc
-extension TaskEditViewController {
-    
-    private func titleInputTextDidChangeNotification(_ note: Notification) {
-        titleInput.text.map { doneButtonItem.isEnabled = $0.count > 0 }
-    }
-    
-    private func clickCancelButtonItem(_ sender: UIBarButtonItem) {
-        dismiss(animated: true)
-    }
-    
-    private func clickDoneButtonItem(_ sender: UIBarButtonItem) {
-        clickCancelButtonItem(sender)
-        titleInput.text.map { task = task ?? Task(title:$0) }
-        task?.title = titleInput.text ?? ""
-        callback?(task)
-    }
-    
 }

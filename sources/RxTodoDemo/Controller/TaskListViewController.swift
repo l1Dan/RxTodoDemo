@@ -8,7 +8,7 @@
 
 import UIKit
 
-class TaskListViewController: UIViewController {
+class TaskListViewController: BaseViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -18,15 +18,21 @@ class TaskListViewController: UIViewController {
         
         view.backgroundColor = .white
         view.addSubview(tableView)
+        
+        addButtonItem.rx.tap.asObservable().subscribe(onNext: { [weak self] in
+            self?.updateTask(nil, at: nil)
+        }).disposed(by: disposeBag)
+        
     }
     
     override func setEditing(_ editing: Bool, animated: Bool) {
         super.setEditing(editing, animated: true)
         tableView.isEditing = editing
+        addButtonItem.isEnabled = !editing
     }
     
-    private lazy var addButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(clickAddButtonItem(_:)))
-    private lazy var list = UserDefaultsManager.exportTasks() ?? Task.list
+    private lazy var addButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: nil, action: nil)
+    private lazy var items = UserDefaultsManager.exportTasks() ?? Task.list
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: UIScreen.main.bounds, style: .plain)
@@ -44,27 +50,22 @@ extension TaskListViewController {
     
     private func updateTask(_ task: Task?, at indexPath: IndexPath?) {
         let viewController = TaskEditViewController()
-        viewController.task = task
+        task.map { viewController.task = $0 }
+
         let navigationController = UINavigationController(rootViewController: viewController)
         present(navigationController, animated: true)
         
         viewController.callback = { [weak self] task in
             guard let self = self else { return }
        
-            if let currentIndexPath = indexPath {
-                task.map { self.list[currentIndexPath.row].title = $0.title }
-                
+            if let current = indexPath {
+                self.items[current.row].title = task.title
             } else {
-                task.map { self.list.append(Task(title: $0.title)) }
+                self.items.append(task)
             }
-            UserDefaultsManager.importTasks(self.list)
+            UserDefaultsManager.importTasks(self.items)
             self.tableView.reloadData()
         }
-    }
-    
-    @objc
-    private func clickAddButtonItem(_ sender: UIBarButtonItem) {
-        updateTask(nil, at: nil)
     }
     
 }
@@ -72,44 +73,44 @@ extension TaskListViewController {
 extension TaskListViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return list.count
+        return items.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") else {
             return UITableViewCell()
         }
-        cell.textLabel?.text = list[indexPath.row].title
-        cell.accessoryType = list[indexPath.row].isSelected ? .checkmark : .none
+        cell.textLabel?.text = items[indexPath.row].title
+        cell.accessoryType = items[indexPath.row].isSelected ? .checkmark : .none
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if tableView.isEditing {
-            updateTask(list[indexPath.row], at: indexPath)
+            updateTask(items[indexPath.row], at: indexPath)
         } else {
             tableView.deselectRow(at: indexPath, animated: true)
-            list[indexPath.row].isSelected = !list[indexPath.row].isSelected
+            items[indexPath.row].isSelected = !items[indexPath.row].isSelected
             tableView.reloadData()
-            UserDefaultsManager.importTasks(list)
+            UserDefaultsManager.importTasks(items)
         }
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         switch editingStyle {
         case .delete:
-            list.remove(at: indexPath.row)
+            items.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .automatic)
         default: debugPrint("None.")
         }
         
-        UserDefaultsManager.importTasks(list)
+        UserDefaultsManager.importTasks(items)
     }
     
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        list.swapAt(sourceIndexPath.row, destinationIndexPath.row)
+        items.swapAt(sourceIndexPath.row, destinationIndexPath.row)
         tableView.moveRow(at: sourceIndexPath, to: destinationIndexPath)
-        UserDefaultsManager.importTasks(list)
+        UserDefaultsManager.importTasks(items)
     }
     
 }

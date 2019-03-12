@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		7609B6A7C81DE583E3B9D9E6 /* Pods_RxTodoDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D9780D43D4B38E23FC24980 /* Pods_RxTodoDemo.framework */; };
+		D6136EB52237CC4000039D96 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6136EB42237CC4000039D96 /* BaseViewController.swift */; };
 		D65ABADF22379631008C0BE2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D65ABADE22379631008C0BE2 /* AppDelegate.swift */; };
 		D65ABAE622379631008C0BE2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D65ABAE522379631008C0BE2 /* Assets.xcassets */; };
 		D65ABAE922379631008C0BE2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D65ABAE722379631008C0BE2 /* LaunchScreen.storyboard */; };
@@ -19,6 +20,7 @@
 
 /* Begin PBXFileReference section */
 		9D9780D43D4B38E23FC24980 /* Pods_RxTodoDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RxTodoDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D6136EB42237CC4000039D96 /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		D65ABADB22379631008C0BE2 /* RxTodoDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RxTodoDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D65ABADE22379631008C0BE2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D65ABAE522379631008C0BE2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -92,6 +94,7 @@
 		D6ABA7B722379D120035E5FA /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				D6136EB42237CC4000039D96 /* BaseViewController.swift */,
 				D6ABA7B522379C900035E5FA /* TaskListViewController.swift */,
 				D6ABA7BA2237A5720035E5FA /* TaskEditViewController.swift */,
 			);
@@ -129,6 +132,7 @@
 				D65ABAD722379631008C0BE2 /* Sources */,
 				D65ABAD822379631008C0BE2 /* Frameworks */,
 				D65ABAD922379631008C0BE2 /* Resources */,
+				77C81A0A9F396DD4A5F1FD9A /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -185,6 +189,36 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		77C81A0A9F396DD4A5F1FD9A /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-RxTodoDemo/Pods-RxTodoDemo-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Differentiator/Differentiator.framework",
+				"${BUILT_PRODUCTS_DIR}/RxAtomic/RxAtomic.framework",
+				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
+				"${BUILT_PRODUCTS_DIR}/RxDataSources/RxDataSources.framework",
+				"${BUILT_PRODUCTS_DIR}/RxSwift/RxSwift.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Differentiator.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxAtomic.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxCocoa.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxDataSources.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-RxTodoDemo/Pods-RxTodoDemo-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		78F409D73A0149A79EDD514C /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -219,6 +253,7 @@
 				D65ABADF22379631008C0BE2 /* AppDelegate.swift in Sources */,
 				D6ABA7BE2237A7950035E5FA /* Task.swift in Sources */,
 				D6ABA7B622379C900035E5FA /* TaskListViewController.swift in Sources */,
+				D6136EB52237CC4000039D96 /* BaseViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
