@@ -26,7 +26,7 @@ class TaskListViewController: UIViewController {
     }
     
     private lazy var addButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(clickAddButtonItem(_:)))
-    private lazy var list = Task.list
+    private lazy var list = UserDefaultsManager.exportTasks() ?? Task.list
     
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: UIScreen.main.bounds, style: .plain)
@@ -57,6 +57,7 @@ extension TaskListViewController {
             } else {
                 task.map { self.list.append(Task(title: $0.title)) }
             }
+            UserDefaultsManager.importTasks(self.list)
             self.tableView.reloadData()
         }
     }
@@ -90,6 +91,7 @@ extension TaskListViewController: UITableViewDelegate, UITableViewDataSource {
             tableView.deselectRow(at: indexPath, animated: true)
             list[indexPath.row].isSelected = !list[indexPath.row].isSelected
             tableView.reloadData()
+            UserDefaultsManager.importTasks(list)
         }
     }
     
@@ -100,11 +102,14 @@ extension TaskListViewController: UITableViewDelegate, UITableViewDataSource {
             tableView.deleteRows(at: [indexPath], with: .automatic)
         default: debugPrint("None.")
         }
+        
+        UserDefaultsManager.importTasks(list)
     }
     
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         list.swapAt(sourceIndexPath.row, destinationIndexPath.row)
         tableView.moveRow(at: sourceIndexPath, to: destinationIndexPath)
+        UserDefaultsManager.importTasks(list)
     }
     
 }

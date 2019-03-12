@@ -14,6 +14,7 @@
 		D6ABA7B622379C900035E5FA /* TaskListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6ABA7B522379C900035E5FA /* TaskListViewController.swift */; };
 		D6ABA7BB2237A5720035E5FA /* TaskEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6ABA7BA2237A5720035E5FA /* TaskEditViewController.swift */; };
 		D6ABA7BE2237A7950035E5FA /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6ABA7BD2237A7950035E5FA /* Task.swift */; };
+		D6ABA7C02237C6350035E5FA /* UserDefaultsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6ABA7BF2237C6350035E5FA /* UserDefaultsManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		D6ABA7B522379C900035E5FA /* TaskListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskListViewController.swift; sourceTree = "<group>"; };
 		D6ABA7BA2237A5720035E5FA /* TaskEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskEditViewController.swift; sourceTree = "<group>"; };
 		D6ABA7BD2237A7950035E5FA /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
+		D6ABA7BF2237C6350035E5FA /* UserDefaultsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsManager.swift; sourceTree = "<group>"; };
 		DB61ACF96E53806A09A54B2B /* Pods-RxTodoDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RxTodoDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-RxTodoDemo/Pods-RxTodoDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		DBA7E0A5C7B0F5CD96D22B53 /* Pods-RxTodoDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RxTodoDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-RxTodoDemo/Pods-RxTodoDemo.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -111,6 +113,7 @@
 			isa = PBXGroup;
 			children = (
 				D6ABA7BD2237A7950035E5FA /* Task.swift */,
+				D6ABA7BF2237C6350035E5FA /* UserDefaultsManager.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -212,6 +215,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D6ABA7BB2237A5720035E5FA /* TaskEditViewController.swift in Sources */,
+				D6ABA7C02237C6350035E5FA /* UserDefaultsManager.swift in Sources */,
 				D65ABADF22379631008C0BE2 /* AppDelegate.swift in Sources */,
 				D6ABA7BE2237A7950035E5FA /* Task.swift in Sources */,
 				D6ABA7B622379C900035E5FA /* TaskListViewController.swift in Sources */,
