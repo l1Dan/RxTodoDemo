@@ -7,9 +7,21 @@
 //
 
 import UIKit
+import RxCocoa
 
 class TaskListViewController: BaseViewController {
 
+    private lazy var addButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: nil, action: nil)
+    private lazy var items = BehaviorRelay(value: UserDefaultsManager.exportTasks() ?? Task.list)
+    
+    private lazy var tableView: UITableView = {
+        let tableView = UITableView(frame: UIScreen.main.bounds, style: .plain)
+        tableView.tableFooterView = UIView()
+        tableView.allowsSelectionDuringEditing = true
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+        return tableView
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -23,6 +35,49 @@ class TaskListViewController: BaseViewController {
             self?.updateTask(nil, at: nil)
         }).disposed(by: disposeBag)
         
+        items.subscribe(onNext: { items in
+            UserDefaultsManager.importTasks(items)
+        }).disposed(by: disposeBag)
+        
+        items.bind(to: tableView.rx.items(cellIdentifier: "Cell", cellType: UITableViewCell.self)) { (row, item, cell) in
+            cell.textLabel?.text = item.title
+            cell.accessoryType = item.isSelected ? .checkmark : .none
+        }.disposed(by: disposeBag)
+        
+        tableView.rx.itemSelected.subscribe(onNext: { [weak self] indexPath in
+            guard let self = self else { return }
+            
+            let items = self.items.value
+            if self.tableView.isEditing {
+                self.updateTask(items[indexPath.row], at: indexPath)
+            } else {
+                self.tableView.deselectRow(at: indexPath, animated: true)
+                items[indexPath.row].isSelected = !items[indexPath.row].isSelected
+            }
+        }).disposed(by: disposeBag)
+        
+        tableView.rx.itemMoved.subscribe(onNext: { [weak self] (sourceIndexPath, destinationIndexPath) in
+            guard let self = self else { return }
+            
+            var items = self.items.value
+            let source = items[sourceIndexPath.row]
+            items.remove(at: sourceIndexPath.row)
+            items.insert(source, at: destinationIndexPath.row)
+            self.items.accept(items)
+        }).disposed(by: disposeBag)
+        
+        tableView.rx.itemDeleted.subscribe(onNext: { [weak self] indexPath in
+            guard let self = self, let editingStyle = self.tableView.cellForRow(at: indexPath)?.editingStyle else { return }
+            
+            var items = self.items.value
+            switch editingStyle {
+            case .delete:
+                items.remove(at: indexPath.row)
+                self.items.accept(items)
+            default: debugPrint("None Ops.")
+            }
+        }).disposed(by: disposeBag)
+        
     }
     
     override func setEditing(_ editing: Bool, animated: Bool) {
@@ -30,19 +85,6 @@ class TaskListViewController: BaseViewController {
         tableView.isEditing = editing
         addButtonItem.isEnabled = !editing
     }
-    
-    private lazy var addButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: nil, action: nil)
-    private lazy var items = UserDefaultsManager.exportTasks() ?? Task.list
-    
-    private lazy var tableView: UITableView = {
-        let tableView = UITableView(frame: UIScreen.main.bounds, style: .plain)
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.tableFooterView = UIView()
-        tableView.allowsSelectionDuringEditing = true
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
-        return tableView
-    }()
 
 }
 
@@ -58,59 +100,14 @@ extension TaskListViewController {
         viewController.callback = { [weak self] task in
             guard let self = self else { return }
        
+            var items = self.items.value
             if let current = indexPath {
-                self.items[current.row].title = task.title
+                items[current.row].title = task.title
             } else {
-                self.items.append(task)
+                items.append(task)
             }
-            UserDefaultsManager.importTasks(self.items)
-            self.tableView.reloadData()
+            self.items.accept(items)
         }
-    }
-    
-}
-
-extension TaskListViewController: UITableViewDelegate, UITableViewDataSource {
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return items.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") else {
-            return UITableViewCell()
-        }
-        cell.textLabel?.text = items[indexPath.row].title
-        cell.accessoryType = items[indexPath.row].isSelected ? .checkmark : .none
-        return cell
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if tableView.isEditing {
-            updateTask(items[indexPath.row], at: indexPath)
-        } else {
-            tableView.deselectRow(at: indexPath, animated: true)
-            items[indexPath.row].isSelected = !items[indexPath.row].isSelected
-            tableView.reloadData()
-            UserDefaultsManager.importTasks(items)
-        }
-    }
-    
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        switch editingStyle {
-        case .delete:
-            items.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .automatic)
-        default: debugPrint("None.")
-        }
-        
-        UserDefaultsManager.importTasks(items)
-    }
-    
-    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        items.swapAt(sourceIndexPath.row, destinationIndexPath.row)
-        tableView.moveRow(at: sourceIndexPath, to: destinationIndexPath)
-        UserDefaultsManager.importTasks(items)
     }
     
 }
